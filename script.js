@@ -1,6 +1,10 @@
 const gameboard = document.getElementById('gameboard');
 const status = document.getElementById('status');
 const restartButton = document.getElementById('restart');
+const popup = document.getElementById('popup');
+const popupMessage = document.getElementById('popup-message');
+const popupRestartButton = document.getElementById('popup-restart');
+const popupContent = document.getElementById('popup-content');
 
 let currentPlayer = 'X';
 let gameActive = true;
@@ -27,15 +31,19 @@ function handleCellClick(clickedCellEvent) {
 
     gameState[clickedCellIndex] = currentPlayer;
     clickedCell.textContent = currentPlayer;
+    clickedCell.classList.add(currentPlayer.toLowerCase());
+
 
     if (checkWin()) {
         status.textContent = `Player ${currentPlayer} has won!`;
+        showPopup(false);
         gameActive = false;
         return;
     }
 
     if (checkDraw()) {
         status.textContent = `Game ended in a draw!`;
+        showPopup(true);
         gameActive = false;
         return;
     }
@@ -58,13 +66,30 @@ function checkDraw() {
     });
 }
 
-
 function restartGame() {
     currentPlayer = 'X';
     gameActive = true;
     gameState = ['', '', '', '', '', '', '', '', ''];
     status.textContent = `It's ${currentPlayer}'s turn`;
-    document.querySelectorAll('.cell').forEach(cell => cell.textContent = '');
+    document.querySelectorAll('.cell').forEach(cell => {
+        cell.textContent = '';
+        cell.classList.remove('x');
+        cell.classList.remove('o');
+    });
+    popup.style.display = 'none';
+}
+
+function showPopup(isDraw) {
+    if (isDraw) {
+        popupMessage.textContent = "It's a draw!";
+        popupContent.classList.remove('win');
+        popupContent.classList.add('draw');
+    } else {
+        popupMessage.textContent = `Player ${currentPlayer} has won!`;
+        popupContent.classList.remove('draw');
+        popupContent.classList.add('win');
+    }
+    popup.style.display = 'flex';
 }
 
 for (let i = 0; i < 9; i++) {
@@ -77,3 +102,4 @@ for (let i = 0; i < 9; i++) {
 
 status.textContent = `It's ${currentPlayer}'s turn`;
 restartButton.addEventListener('click', restartGame);
+popupRestartButton.addEventListener('click', restartGame);
